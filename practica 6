@@ -1,0 +1,597 @@
+/*
+
+Arduino     Accelerometer ADXL345
+
+  A5            SCL
+
+  A4            SDA
+
+  3.3V          CS
+
+  3.3V          VCC
+
+  GND           GND
+
+
+
+
+Conexión de servomotores:
+
+Arduino     Servo No. 1
+
+  5V          5V
+
+  GND         GND
+
+  D3          CTRL
+
+
+
+
+Arduino     Servo No. 2
+
+  5V          5V
+
+  GND         GND
+
+  D5          CTRL
+
+*/
+
+
+
+
+//para la cancion
+
+int pinBuzzer = 6;
+
+const int sensorPin = 9;
+
+
+
+
+int C_ =  261/2;
+
+int Cs_=  277/2;
+
+int D_ =  293/2 ;
+
+int Ds_=  311/2;
+
+int E_ =  329/2 ;
+
+int F_ =  349/2 ;
+
+int Fs_=  369/2;
+
+int G_ =  391/2 ;
+
+int Gs_=  415/2;
+
+int A_ =  440/2 ;
+
+int As_=  466/2;
+
+int B_ =  493/2 ;
+
+
+
+
+int Sil = 5;
+
+int C =  261;
+
+int Cs=  277;
+
+int D =  293 ;
+
+int Ds=  311;
+
+int E =  329 ;
+
+int F =  349 ;
+
+int Fs=  369;
+
+int G =  391 ;
+
+int Gs=  415;
+
+int A =  440 ;
+
+int As=  466;
+
+int B =  493 ;
+
+
+
+
+int C2   =524;
+
+int Cs2  =555;
+
+int D2   =588;
+
+int Ds2  =623;
+
+int E2   =660;
+
+int F2   =699;
+
+int Fs2  =740;
+
+int G2   =784;
+
+int Gs2  =831;
+
+int A_2   = 880;
+
+int As2  =933;
+
+int B2   =988;
+
+
+
+
+int C3  =1047;
+
+int Cs3  =555*2;
+
+int D3   =588*2;
+
+int Ds3  =623*2;
+
+int E3   =660*2;
+
+int F3   =699*2;
+
+int Fs3  =740*2;
+
+int G3   =784*2;
+
+int Gs3  =831*2;
+
+int A_3   = 880*2;
+
+int As3  =933*2;
+
+int B3   =988*2;
+
+
+
+
+
+
+int tempo=185;
+
+int negra=60000/tempo;
+
+int semi = negra/4;
+
+
+
+
+//int semi =86;
+
+int corch = 2*semi;
+
+//int negra = corch*2;
+
+int np = corch*3;
+
+
+
+
+int blanca = negra*2;
+
+int redonda = blanca*2;
+
+int rep = 3*negra;
+
+int bnp = 3*negra+3*corch;
+
+
+
+
+int retardo = 100;
+
+
+
+
+void nota(int nota, int duracion){
+
+  tone(pinBuzzer,nota, duracion);
+
+  delay(duracion);
+
+  noTone(pinBuzzer);
+
+  delay(duracion);
+
+}
+
+//fin de las variables para la song
+
+
+
+
+// agregamos librerias
+
+#include <Wire.h>
+
+#include <SparkFun_ADXL345.h>
+
+#include <Servo.h>
+
+
+
+
+Servo servo_horizontal;
+
+Servo servo_vertical;
+
+ADXL345 adxl;             //Declaramos nuestro acelerometro ADXL345
+
+
+
+
+//Declaramos variables
+
+int mappedRawX, mappedejeY;
+
+
+
+
+void setup() { // inicializamos nuestro programa
+
+  inicializar();
+
+  configurarServos();
+
+  esperarInicializacion();
+
+   pinMode(pinBuzzer,LOW);
+
+}
+
+
+
+
+void loop() { //lee y espera a los a servos
+
+  leerAcelerometro();
+
+  actualizarServos();
+
+  delay(100);
+
+
+
+
+int value=0;
+
+value = digitalRead(sensorPin);
+
+if(value==HIGH){
+
+prePre2();
+
+DondeLosViernes();
+
+ delay(1000);
+
+
+
+
+}
+
+
+
+
+void inicializar() {  // iniciamos el  programa principal
+
+  Serial.begin(9600);
+
+  adxl.powerOn();
+
+  adxl.setRangeSetting(2);
+
+}
+
+
+
+
+void configurarServos() {
+
+  servo_horizontal.attach(3);
+
+  servo_vertical.attach(5);
+
+  servo_horizontal.write(90);
+
+  servo_vertical.write(90);
+
+}
+
+
+
+
+void esperarInicializacion() { // bucle de tiempo para esperar a los servos
+
+  delay(2000);
+
+}
+
+
+
+
+void leerAcelerometro() {
+
+  int ejeX, ejeY, ejeZ;
+
+  adxl.readAccel(&ejeX, &ejeY, &ejeZ);
+
+  mappedRawX = map(ejeX, -255, 255, 179, 0);
+
+  mappedejeY = map(ejeY, -255, 255, 0, 179);
+
+}
+
+
+
+
+void actualizarServos() {
+
+  servo_horizontal.write(mappedRawX);
+
+  servo_vertical.write(mappedejeY);
+
+}
+
+
+
+
+void esperar(int ms) {  //Esta función generaliza la espera durante un período de tiempo específico en milisegundos.
+
+  delay(ms);
+
+}
+
+
+
+
+
+void prePre(){
+
+    nota(Cs2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  negra);
+
+    nota(A_2,  corch);
+
+    nota(Fs2,  corch);  
+
+    nota(Gs2,  corch);      
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(B2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  negra);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(B2,  corch);  
+
+    nota(B2,  negra);  
+
+    nota(A_2,  negra);  
+
+    nota(Gs2,  corch);  
+
+    nota(Fs2,  negra);  
+
+    nota(E2,  negra );  
+
+    nota(Cs2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(Cs2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(Cs2,  corch);  
+
+    nota(D2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(Fs2,  corch);  
+
+   nota(E2,  corch);  
+
+   nota(D2,  corch);  
+
+   nota(D2,  corch);  
+
+   nota(D2,  corch);  
+
+   nota(D2,  corch);  
+
+   nota(D2,  corch);  
+
+   nota(D2,  corch);  
+
+  nota(Fs2,  negra);  
+
+  nota(E2,  negra);
+
+    nota(Sil,  corch);  
+
+    nota(Sil,  negra);  
+
+}
+
+
+
+
+void prePre2(){
+
+  nota(Fs2,  corch);  
+
+  nota(Gs2,  corch);
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  negra);
+
+    nota(A_2,  corch);  
+
+    nota(Fs2,  corch);  
+
+    nota(Gs2,  corch);      
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(A_2,  negra);
+
+    nota(A_2,  corch);  
+
+    nota(A_2,  corch);  
+
+    nota(B2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  negra);  
+
+    nota(Gs2,  corch);  
+
+    nota(Gs2,  corch);  
+
+    nota(B2,  corch);  
+
+   
+
+    // __ 35
+
+    nota(B2,  negra);  
+
+    nota(A_2,  negra);  
+
+    nota(Gs2,  corch);  
+
+    nota(Fs2,  negra);  
+
+    nota(E2,  corch );  
+
+}
+
+void DondeLosViernes(){
+
+    nota(Sil,  corch);  
+
+    nota(Cs2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(Cs2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(Cs2,  corch);  
+
+    nota(D2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(E2,  corch);
+
+    nota(E2,  corch);
+
+    nota(Fs2,  corch);  
+
+    nota(E2,  corch);  
+
+    nota(D2,  corch);  
+
+    nota(D2,  corch);  
+
+    nota(D2,  corch);  
+
+   nota(D2,  corch);  
+
+   nota(A,  corch);  
+
+   nota(A,  corch);  
+
+   nota(B,negra);  
+
+   nota(A,  negra);  
+
+    nota(Sil,  corch);    
+
+}
