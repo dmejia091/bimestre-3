@@ -1,0 +1,111 @@
+#include <Wire.h>
+
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27,16,2);
+
+const float Factor_1 = 0.185; //Factor de Medicion para lectura de -5A a 5A
+
+const float Factor_2 = 0.1; //Factor de Medicion para lectura de -20A a 20A
+
+const float Factor_3 = 0.066; //Factor de Medicion para lectura de -30A a 30A
+
+int Lectura2 = 0; // Lectura del pin A////7ds l0
+
+double Corriente = 0; //Guarda el valor de la corriente leida en el sensor
+
+float voltajeSensor = 0; //guarda los valores de 0 a 5
+
+int pulsador =2;
+
+int pulsador2 =3;
+
+int estado;
+
+int estado2;
+
+const float Factor = 1.25; // Constante del Factor de Lectura
+
+int lectura = 0; //Guardar La lectura hecha por el sensor
+
+void setup() {
+
+  Serial.begin(9600); //Inicializa la comunicacion Serial
+
+pinMode(pulsador,OUTPUT);  
+
+lcd.init();
+
+  lcd.backlight();
+
+  lcd.clear();
+
+  Wire.begin(); // Inicia el puerto I2C
+
+}
+
+
+
+
+void loop() {
+
+   estado= digitalRead(pulsador);
+
+  estado2= digitalRead(pulsador2);
+
+ 
+
+  Lectura2 = analogRead(A1); //Leer el pin analogico
+
+  voltajeSensor = (Lectura2*5.0) / 1023.0; //lectura del sensor  
+
+  Corriente = (voltajeSensor - 2.5)/Factor_3; //Ecuación  para obtener la corriente
+
+  Serial.print("Corriente: ");
+
+  Serial.print(Corriente,3);
+
+  Serial.println(" A");
+
+  delay(500);  
+
+
+
+
+  lectura = analogRead(A2); //Para hacer la lectura del pin A0
+
+float voltaje =  (25*lectura*Factor)/1023; // Conversion de lectura analogica a valores de medicion
+
+Serial.print("Voltaje medido =  ");
+
+Serial.print(voltaje); // Muestra en el monitor serial la lectura
+
+Serial.println("V");
+
+delay(250);
+
+  if(estado=0){
+
+    lcd.setCursor(0,0);
+
+  lcd.print("voltaje: ");
+
+  lcd.setCursor(0,1);
+
+  lcd.print(voltaje);
+
+  }
+
+  if(estado2=0){
+
+    lcd.setCursor(0,0);
+
+  lcd.print("Corriente: ");
+
+  lcd.setCursor(0,1);
+
+  lcd.print(Corriente);
+
+  }
+
+}
